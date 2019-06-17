@@ -87,7 +87,7 @@ public class PassengerMapsActivity extends FragmentActivity implements OnMapRead
             @Override
             public void onClick(View v) {
                 auth.signOut();
-                signOutDriver();
+                signOutPassenger();
             }
         });
 
@@ -109,15 +109,15 @@ public class PassengerMapsActivity extends FragmentActivity implements OnMapRead
 
     }
 
-    private void signOutDriver() {
+    private void signOutPassenger() {
 
-        String driverUserId = currentUser.getUid();
-        DatabaseReference drivers = FirebaseDatabase.getInstance()
+        String passengerUserId = currentUser.getUid();
+        DatabaseReference passengers = FirebaseDatabase.getInstance()
                 .getReference()
                 .child("passengers");
 
-        GeoFire geoFire = new GeoFire(drivers);
-        geoFire.removeLocation(driverUserId);
+        GeoFire geoFire = new GeoFire(passengers);
+        geoFire.removeLocation(passengerUserId);
 
         Intent intent = new Intent(PassengerMapsActivity.this,
                 ChooseModeActivity.class);
@@ -145,10 +145,10 @@ public class PassengerMapsActivity extends FragmentActivity implements OnMapRead
         if (currentLocation != null) {
 
             // Add a marker in Sydney and move the camera
-            LatLng driverLocation = new LatLng(currentLocation.getLatitude(),
+            LatLng passengerLocation = new LatLng(currentLocation.getLatitude(),
                     currentLocation.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(driverLocation).title("Driver location"));
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(driverLocation));
+            mMap.addMarker(new MarkerOptions().position(passengerLocation).title("Passenger location"));
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(passengerLocation));
         }
     }
 
@@ -309,18 +309,18 @@ public class PassengerMapsActivity extends FragmentActivity implements OnMapRead
 
         if (currentLocation != null) {
 
-            LatLng driverLocation = new LatLng(currentLocation.getLatitude(),
+            LatLng passengerLocation = new LatLng(currentLocation.getLatitude(),
                     currentLocation.getLongitude());
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(driverLocation));
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(passengerLocation));
             mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
-            mMap.addMarker(new MarkerOptions().position(driverLocation).title("Driver location"));
+            mMap.addMarker(new MarkerOptions().position(passengerLocation).title("Passenger location"));
 
-            String driverUserId = currentUser.getUid();
-            DatabaseReference drivers = FirebaseDatabase.getInstance().getReference()
+            String passengerUserId = currentUser.getUid();
+            DatabaseReference passengers = FirebaseDatabase.getInstance().getReference()
                     .child("passengers");
 
-            GeoFire geoFire = new GeoFire(drivers);
-            geoFire.setLocation(driverUserId, new GeoLocation(currentLocation.getLatitude(),
+            GeoFire geoFire = new GeoFire(passengers);
+            geoFire.setLocation(passengerUserId, new GeoLocation(currentLocation.getLatitude(),
                     currentLocation.getLongitude()));
         }
 
