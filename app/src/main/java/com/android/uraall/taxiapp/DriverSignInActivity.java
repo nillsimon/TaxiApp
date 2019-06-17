@@ -38,6 +38,13 @@ public class DriverSignInActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driver_sign_in);
 
+        auth = FirebaseAuth.getInstance();
+
+        if (auth.getCurrentUser() != null) {
+            startActivity(new Intent(DriverSignInActivity.this,
+                    DriverMapsActivity.class));
+        }
+
         textInputEmail = findViewById(R.id.textInputEmail);
         textInputName = findViewById(R.id.textInputName);
         textInputPassword = findViewById(R.id.textInputPassword);
@@ -45,8 +52,6 @@ public class DriverSignInActivity extends AppCompatActivity {
 
         loginSignUpButton = findViewById(R.id.loginSignUpButton);
         toggleLoginSignUpTextView = findViewById(R.id.toggleLoginSignUpTextView);
-
-        auth = FirebaseAuth.getInstance();
 
 
     }
@@ -136,11 +141,12 @@ public class DriverSignInActivity extends AppCompatActivity {
                                     if (task.isSuccessful()) {
                                         // Sign in success, update UI with the signed-in user's information
                                         Log.d(TAG, "signInWithEmail:success");
+                                        FirebaseUser user = auth.getCurrentUser();
                                         startActivity(new Intent(
                                                 DriverSignInActivity.this,
                                                 DriverMapsActivity.class
                                         ));
-                                        FirebaseUser user = auth.getCurrentUser();
+
                                         //updateUI(user);
                                     } else {
                                         // If sign in fails, display a message to the user.
