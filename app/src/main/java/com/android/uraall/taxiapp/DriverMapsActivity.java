@@ -317,10 +317,13 @@ public class DriverMapsActivity extends FragmentActivity implements OnMapReadyCa
             mMap.addMarker(new MarkerOptions().position(driverLocation).title("Driver location"));
 
             String driverUserId = currentUser.getUid();
+            DatabaseReference driversGeoFire = FirebaseDatabase.getInstance().getReference()
+                    .child("driversGeoFire");
             DatabaseReference drivers = FirebaseDatabase.getInstance().getReference()
                     .child("drivers");
+            drivers.setValue(true);
 
-            GeoFire geoFire = new GeoFire(drivers);
+            GeoFire geoFire = new GeoFire(driversGeoFire);
             geoFire.setLocation(driverUserId, new GeoLocation(currentLocation.getLatitude(),
                     currentLocation.getLongitude()));
         }
