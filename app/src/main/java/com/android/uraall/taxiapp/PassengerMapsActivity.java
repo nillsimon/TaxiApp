@@ -40,6 +40,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -48,9 +49,13 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.List;
 
 public class PassengerMapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -75,10 +80,12 @@ public class PassengerMapsActivity extends FragmentActivity implements OnMapRead
     private FirebaseAuth auth;
     private FirebaseUser currentUser;
 
-    DatabaseReference driversGeoFire;
+    private DatabaseReference driversGeoFire;
+    private DatabaseReference nearestDriverLocation;
     private int searchRadius = 1;
     private boolean isDriverFound = false;
     private String nearestDriverId;
+    private Marker driverMarker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,6 +158,8 @@ public class PassengerMapsActivity extends FragmentActivity implements OnMapRead
 
                     isDriverFound = true;
                     nearestDriverId = key;
+                    
+                    getNearestDriverLocation();
 
                 }
 
@@ -180,6 +189,75 @@ public class PassengerMapsActivity extends FragmentActivity implements OnMapRead
 
             @Override
             public void onGeoQueryError(DatabaseError error) {
+
+            }
+        });
+
+    }
+
+    private void getNearestDriverLocation() {
+
+        bookTaxiButton.setText("Getting your driver location...");
+
+        nearestDriverLocation = FirebaseDatabase.getInstance().getReference()
+                .child("driversGeoFire").child(nearestDriverId).child("l");
+
+        nearestDriverLocation.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                if (dataSnapshot.exists()) {
+
+                    List<Object> driverLocationParameters =
+                            (List<Object>) dataSnapshot.getValue();
+
+                    double latitude = 0;
+                    double longitude = 0;
+
+                    if (driverLocationParameters.get(0) != null) {
+
+                        latitude = Double.parseDouble(
+                                driverLocationParameters.get(0).toString()
+                        );
+
+                    }
+
+                    if (driverLocationParameters.get(1) != null) {
+
+                        longitude = Double.parseDouble(
+                                driverLocationParameters.get(1).toString()
+                        );
+
+                    }
+
+                    LatLng driverLatLng = new LatLng(latitude, longitude);
+
+                    if (driverMarker != null) {
+                        driverMarker.remove();
+                    }
+
+                    Location driverLocation = new Location("");
+                    driverLocation.setLatitude(latitude);
+                    driverLocation.setLongitude(longitude);
+
+                    float distanceToDriver =
+                            driverLocation.distanceTo(currentLocation);
+
+                    bookTaxiButton.setText("Distance to driver: " +
+                            distanceToDriver);
+
+
+                    driverMarker = mMap.addMarker(
+                            new MarkerOptions().position(driverLatLng)
+                            .title("Your driver is here")
+                    );
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });
