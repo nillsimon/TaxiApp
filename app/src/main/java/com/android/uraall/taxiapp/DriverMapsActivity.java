@@ -315,7 +315,7 @@ public class DriverMapsActivity extends FragmentActivity implements OnMapReadyCa
             mMap.moveCamera(CameraUpdateFactory.newLatLng(driverLocation));
             mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
             mMap.addMarker(new MarkerOptions().position(driverLocation).title("Driver location"));
-
+/*
             String driverUserId = currentUser.getUid();
             DatabaseReference driversGeoFire = FirebaseDatabase.getInstance().getReference()
                     .child("driversGeoFire");
@@ -326,6 +326,7 @@ public class DriverMapsActivity extends FragmentActivity implements OnMapReadyCa
             GeoFire geoFire = new GeoFire(driversGeoFire);
             geoFire.setLocation(driverUserId, new GeoLocation(currentLocation.getLatitude(),
                     currentLocation.getLongitude()));
+       */
         }
 
     }
